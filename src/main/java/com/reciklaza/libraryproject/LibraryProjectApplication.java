@@ -21,7 +21,7 @@ public class LibraryProjectApplication implements ApplicationRunner {
 	}
 
 	@Override
-	public void run(ApplicationArguments args) throws Exception {
+	public void run(ApplicationArguments args) {
 		Book book = Book.builder()
 				.title("naslov")
 				.author("pisac")
