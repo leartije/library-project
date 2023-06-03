@@ -24,18 +24,25 @@ import lombok.NoArgsConstructor;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     @NotBlank(message = "title can't be blank")
     @Size(min = 1, max = 250)
     private String title;
-    @NotBlank(message = "author can't be blank")
-    @Size(min = 1, max = 50)
-    private String author;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Author author;
+
     @NotBlank(message = "ISBN can't be blank")
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String ISBN;
+
+    @Column(nullable = false)
     private boolean available;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

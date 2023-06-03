@@ -24,15 +24,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @NotBlank(message = "first name can't be blank")
     private String firstName;
+
     @NotBlank(message = "last name can't be blank")
     private String lastName;
+
     @NotBlank(message = "password can't be blank")
     private String password;
+
     @NotBlank(message = "email can't be blank")
     @Column(unique = true)
     private String email;
+
     @OneToMany(mappedBy = "user")
     private List<Book> books;
 

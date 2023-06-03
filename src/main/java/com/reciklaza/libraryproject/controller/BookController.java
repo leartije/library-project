@@ -2,29 +2,33 @@ package com.reciklaza.libraryproject.controller;
 
 import com.reciklaza.libraryproject.entity.Book;
 import com.reciklaza.libraryproject.repository.BookRepository;
+import com.reciklaza.libraryproject.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/books")
+@RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 public class BookController {
 
     private final BookRepository bookRepository;
+    private final BookService bookService;
 
-    @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        return ResponseEntity.ok().body(bookRepository.findAll());
+
+    @GetMapping(path = "/public/books")
+    public ResponseEntity<List<Book>> getAllBooks() throws Exception {
+        return ResponseEntity.ok().body(bookService.getAll());
     }
 
-    @PostMapping
+    @GetMapping(path = "/public/books/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable(value = "id") Long id) {
+        return ResponseEntity.ok().body(bookService.getById(id));
+    }
+
+    @PostMapping(path = "admin/books")
     public ResponseEntity<Book> postBook(@RequestBody Book book) {
         return ResponseEntity.ok().body(bookRepository.save(book));
     }
