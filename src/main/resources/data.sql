@@ -1,13 +1,13 @@
-INSERT INTO author (name, lastname) VALUES ('Lav', 'Tolstoj');
-INSERT INTO author (name, lastname) VALUES ('Pol', 'Oster');
-INSERT INTO author (name, lastname) VALUES ('Erland', 'Lu');
-INSERT INTO author (name, lastname) VALUES ('Daglas', 'Adams');
-INSERT INTO author (name, lastname) VALUES ('Karl Uve', 'Knausgor');
-INSERT INTO author (name, lastname) VALUES ('Borislav', 'Pekic');
-INSERT INTO author (name, lastname) VALUES ('Milos', 'Crnjanski');
-INSERT INTO author (name, lastname) VALUES ('Dzonatan', 'Franzen');
-INSERT INTO author (name, lastname) VALUES ('Dzon', 'Stajnbak');
-INSERT INTO author (name, lastname) VALUES ('Vilijam Somerset', 'Mom');
+INSERT INTO authors (name, lastname) VALUES ('Lav', 'Tolstoj');
+INSERT INTO authors (name, lastname) VALUES ('Pol', 'Oster');
+INSERT INTO authors (name, lastname) VALUES ('Erland', 'Lu');
+INSERT INTO authors (name, lastname) VALUES ('Daglas', 'Adams');
+INSERT INTO authors (name, lastname) VALUES ('Karl Uve', 'Knausgor');
+INSERT INTO authors (name, lastname) VALUES ('Borislav', 'Pekic');
+INSERT INTO authors (name, lastname) VALUES ('Milos', 'Crnjanski');
+INSERT INTO authors (name, lastname) VALUES ('Dzonatan', 'Franzen');
+INSERT INTO authors (name, lastname) VALUES ('Dzon', 'Stajnbak');
+INSERT INTO authors (name, lastname) VALUES ('Vilijam Somerset', 'Mom');
 
 
 INSERT INTO books (title, author_id, isbn, available) VALUES ('Rat i mir', 1, '11-111', true);

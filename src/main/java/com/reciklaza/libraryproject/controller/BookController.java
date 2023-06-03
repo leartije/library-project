@@ -1,6 +1,8 @@
 package com.reciklaza.libraryproject.controller;
 
 import com.reciklaza.libraryproject.entity.Book;
+import com.reciklaza.libraryproject.entity.dto.BookDTO;
+import com.reciklaza.libraryproject.repository.AuthorRepository;
 import com.reciklaza.libraryproject.repository.BookRepository;
 import com.reciklaza.libraryproject.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -16,21 +18,28 @@ public class BookController {
 
     private final BookRepository bookRepository;
     private final BookService bookService;
+    private final AuthorRepository authorRepository;
 
 
     @GetMapping(path = "/public/books")
-    public ResponseEntity<List<Book>> getAllBooks() throws Exception {
+    public ResponseEntity<List<BookDTO>> getAllBooks(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "lastname", required = false) String lastname) {
+        if (name != null && lastname != null) {
+            return ResponseEntity.ok().body(bookService.getByAuthor(name, lastname));
+        }
         return ResponseEntity.ok().body(bookService.getAll());
     }
 
-    @GetMapping(path = "/public/books/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok().body(bookService.getById(id));
+    @GetMapping(path = "/public/books/{isbn}")
+    public ResponseEntity<BookDTO> getBookByISBN(@PathVariable(value = "isbn") String isbn) {
+        return ResponseEntity.ok().body(bookService.getByISBN(isbn));
     }
 
+
     @PostMapping(path = "admin/books")
-    public ResponseEntity<Book> postBook(@RequestBody Book book) {
-        return ResponseEntity.ok().body(bookRepository.save(book));
+    public ResponseEntity<BookDTO> postBook(@RequestBody Book book) {
+        return ResponseEntity.ok().body(bookService.save(book));
     }
 
 }
