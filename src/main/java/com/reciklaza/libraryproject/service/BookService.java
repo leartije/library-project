@@ -43,21 +43,30 @@ public class BookService {
         if (book.isPresent()) {
             return bookToBookDTO(book.get());
         }
-        throw new BookNotFoundException("Book with ISBN = " + isbn + " is not found");
+        throw new BookNotFoundException(String.format("Book with isbn=%s is not found.", isbn));
     }
 
     public List<BookDTO> getByAuthor(String name, String lastname) {
-        Optional<Author> authorByNameAndLastname = authorRepository.findByNameAndLastname(name, lastname);
+        Optional<Author> authorByNameAndLastname = authorRepository.findByNameIgnoreCaseAndLastnameIgnoreCase(name, lastname);
         if (authorByNameAndLastname.isEmpty()) {
-            throw new BookNotFoundException("there is not books by this author");
+            throw new BookNotFoundException(String.format("There are no books by '%s %s'.", name, lastname));
         }
         Author author = authorByNameAndLastname.get();
         return booksListToBookDTOList(author.getBooks());
     }
 
+    public List<BookDTO> getByAvailable(boolean available) {
+        List<Book> books = bookRepository.findByAvailable(available);
+        if (books.isEmpty()) {
+            throw new BookNotFoundException(String.format("%s",
+                    available ? "No available books in database" : "All books are available"));
+        }
+        return booksListToBookDTOList(books);
+    }
+
     public BookDTO save(Book book) {
         Optional<Author> authorByNameAndLastname = authorRepository
-                .findByNameAndLastname(book.getAuthor().getName(), book.getAuthor().getLastname());
+                .findByNameIgnoreCaseAndLastnameIgnoreCase(book.getAuthor().getName(), book.getAuthor().getLastname());
 
         if (authorByNameAndLastname.isEmpty()) {
             Author author = Author.builder()
@@ -75,10 +84,19 @@ public class BookService {
         return bookToBookDTO(book);
     }
 
+    public String deleteBookById(Long id) {
+        Optional<Book> byId = bookRepository.findById(id);
+        if (byId.isPresent()) {
+            bookRepository.deleteById(id);
+            return String.format("'%s' is deleted from database", byId.get().getTitle());
+        }
+        throw new BookNotFoundException(String.format("The Book with id = %d is not found", id));
+    }
+
     private List<BookDTO> booksListToBookDTOList(List<Book> books) {
         List<BookDTO> booksResponse = new ArrayList<>();
-        for (Book b : books) {
-            BookDTO bookDTO = bookToBookDTO(b);
+        for (Book book : books) {
+            BookDTO bookDTO = bookToBookDTO(book);
             booksResponse.add(bookDTO);
         }
         return booksResponse;

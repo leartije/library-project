@@ -1,5 +1,6 @@
 package com.reciklaza.libraryproject.entity;
 
+import com.reciklaza.libraryproject.entity.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
