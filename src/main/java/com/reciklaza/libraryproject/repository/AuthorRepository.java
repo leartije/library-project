@@ -10,11 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
-
     @Query("SELECT a FROM Author a WHERE LOWER(a.name) = LOWER(:name) AND LOWER(a.lastname) = LOWER(:lastname)")
-    Optional<Author> findByNameAndLastname(@Param("name") String name, @Param("lastname") String lastname);
-
-
-
-
+    Optional<Author> findByNameIgnoreCaseAndLastnameIgnoreCase(@Param("name") String name, @Param("lastname") String lastname);
 }
