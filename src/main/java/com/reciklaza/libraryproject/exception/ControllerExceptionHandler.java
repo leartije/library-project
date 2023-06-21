@@ -20,10 +20,27 @@ public class ControllerExceptionHandler {
         return buildResponseEntity(errorMessage);
     }
 
+    @ExceptionHandler(value = {BookNotAvailableException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleNotAvailableBookException(HttpServletRequest request, BookNotAvailableException ex) {
+        String error = "The Book is not available: " + request.getRequestURI();
+        ErrorMessage errorMessage = new ErrorMessage(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getMessage());
+        return buildResponseEntity(errorMessage);
+
+    }
+
     @ExceptionHandler(value = {NotValidUserSubmissionException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleNotValidBookSubmissionException(HttpServletRequest request, NotValidUserSubmissionException ex) {
         String error = "Unable to submit the book: " + request.getRequestURI();
+        ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, LocalDateTime.now(), error, ex.getMessage());
+        return buildResponseEntity(errorMessage);
+    }
+
+    @ExceptionHandler(value = {UnauthorisedAccessException.class})
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Object> handleUnauthorisedAccessException(HttpServletRequest request, UnauthorisedAccessException ex) {
+        String error = "Unauthorised access denied" + request.getRequestURI();
         ErrorMessage errorMessage = new ErrorMessage(HttpStatus.NOT_FOUND, LocalDateTime.now(), error, ex.getMessage());
         return buildResponseEntity(errorMessage);
     }
