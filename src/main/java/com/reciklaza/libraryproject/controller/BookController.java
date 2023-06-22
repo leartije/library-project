@@ -13,11 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 /**
- Controller class for handling book-related API endpoints.
+ * Controller class for handling book-related API endpoints.
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -30,11 +29,12 @@ public class BookController {
     private final JwtService jwtService;
 
     /**
-     Retrieves a list of all books.
-     @param name Optional parameter to filter books by author's name.
-     @param lastname Optional parameter to filter books by author's lastname.
-     @param available Optional parameter to filter books by availability.
-     @return ResponseEntity containing the list of book DTOs.
+     * Retrieves a list of all books.
+     *
+     * @param name      Optional parameter to filter books by author's name.
+     * @param lastname  Optional parameter to filter books by author's lastname.
+     * @param available Optional parameter to filter books by availability.
+     * @return ResponseEntity containing the list of book DTOs.
      */
     @GetMapping(path = "/public/books")
     public ResponseEntity<List<BookDto>> getAllBooks(
@@ -52,9 +52,10 @@ public class BookController {
     }
 
     /**
-     Retrieves a book by its ISBN.
-     @param isbn The ISBN of the book.
-     @return ResponseEntity containing the book DTO.
+     * Retrieves a book by its ISBN.
+     *
+     * @param isbn The ISBN of the book.
+     * @return ResponseEntity containing the book DTO.
      */
     @GetMapping(path = "/public/books/{isbn}")
     public ResponseEntity<BookDto> getBookByISBN(@PathVariable(value = "isbn") String isbn) {
@@ -62,18 +63,18 @@ public class BookController {
     }
 
     /**
-     Adds a new book to the database.
-     @param jwt The JWT token for authorization.
-     @param book The book entity to be added.
-     @return ResponseEntity containing the added book DTO.
-     @throws Exception if the user is not authorized.
+     * Adds a new book to the database.
+     *
+     * @param jwt  The JWT token for authorization.
+     * @param book The book entity to be added.
+     * @return ResponseEntity containing the added book DTO.
+     * @throws UnauthorisedAccessException if the user is not authorized.
      */
     @PostMapping(path = "/admin/books")
     public ResponseEntity<BookDto> postBook(
             @RequestHeader(AUTHORIZATION) String jwt,
             @RequestBody Book book
-    )
-            throws Exception {
+    ) {
         if (jwtService.authorised(jwt, Role.ADMIN) != null) {
             if (book == null) {
                 throw new NotValidUserSubmissionException("Book is null");
@@ -81,37 +82,38 @@ public class BookController {
 
             return ResponseEntity.ok().body(bookService.save(book));
         }
-        throw new Exception("To add the book, you need to have administrator privileges");
+        throw new UnauthorisedAccessException("To add the book, you need to have administrator privileges");
     }
 
     /**
-     Deletes a book from the database by its ID.
-     @param jwt The JWT token for authorization.
-     @param id The ID of the book to be deleted.
-     @return ResponseEntity containing a message indicating the deletion status.
-     @throws Exception if the user is not authorized.
+     * Deletes a book from the database by its ID.
+     *
+     * @param jwt The JWT token for authorization.
+     * @param id  The ID of the book to be deleted.
+     * @return ResponseEntity containing a message indicating the deletion status.
+     * @throws UnauthorisedAccessException if the user is not authorized.
      */
     @DeleteMapping(path = "/admin/book/{id}")
     public ResponseEntity<String> deleteBookById(
             @RequestHeader(AUTHORIZATION) String jwt,
             @PathVariable(value = "id") Long id
-    )
-            throws Exception {
+    ) {
         if (jwtService.authorised(jwt, Role.ADMIN) != null) {
             if (id == null) {
                 throw new NotValidUserSubmissionException("Id is null!");
             }
             return ResponseEntity.ok(bookService.deleteBookById(id));
         }
-        throw new AccessDeniedException("To delete the book, you need to have administrator privileges");
+        throw new UnauthorisedAccessException("To delete the book, you need to have administrator privileges");
     }
 
     /**
-     Borrows a book by its ID for the logged-in user.
-     @param jwt The JWT token for authorization.
-     @param id The ID of the book to be borrowed.
-     @return ResponseEntity containing a message indicating the borrowing status.
-     @throws UnauthorisedAccessException if the user is not logged in.
+     * Borrows a book by its ID for the logged-in user.
+     *
+     * @param jwt The JWT token for authorization.
+     * @param id  The ID of the book to be borrowed.
+     * @return ResponseEntity containing a message indicating the borrowing status.
+     * @throws UnauthorisedAccessException if the user is not logged in.
      */
     @GetMapping(path = "/user/book/borrow/{id}")
     public ResponseEntity<String> borrowTheBook(
@@ -127,11 +129,12 @@ public class BookController {
     }
 
     /**
-     Returns a borrowed book by its ID for the logged-in user.
-     @param jwt The JWT token for authorization.
-     @param id The ID of the book to be returned.
-     @return ResponseEntity containing a message indicating the return status.
-     @throws UnauthorisedAccessException if the user is not logged in.
+     * Returns a borrowed book by its ID for the logged-in user.
+     *
+     * @param jwt The JWT token for authorization.
+     * @param id  The ID of the book to be returned.
+     * @return ResponseEntity containing a message indicating the return status.
+     * @throws UnauthorisedAccessException if the user is not logged in.
      */
     @GetMapping(path = "/user/book/return/{id}")
     public ResponseEntity<String> returnTheBook(
