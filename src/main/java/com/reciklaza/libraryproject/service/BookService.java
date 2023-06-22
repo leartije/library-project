@@ -80,16 +80,16 @@ public class BookService {
 
     /**
      Retrieves a list of books by the author's name and lastname.
-     @param name The firstname of the author.
+     @param firstName The firstname of the author.
      @param lastname The lastname of the author.
      @return List of books written by the specified author.
      @throws BookNotFoundException If no books are found by the specified author.
      */
-    public List<BookDto> getByAuthor(String name, String lastname) {
+    public List<BookDto> getByAuthor(String firstName, String lastname) {
         Optional<Author> authorByNameAndLastname =
-                authorRepository.findByNameIgnoreCaseAndLastnameIgnoreCase(name, lastname);
+                authorRepository.findByNameIgnoreCaseAndLastnameIgnoreCase(firstName, lastname);
         if (authorByNameAndLastname.isEmpty()) {
-            throw new BookNotFoundException(String.format("There are no books by '%s %s'.", name, lastname));
+            throw new BookNotFoundException(String.format("There are no books by '%s %s'.", firstName, lastname));
         }
         Author author = authorByNameAndLastname.get();
         return booksListToBookDTOList(author.getBooks());
@@ -179,7 +179,7 @@ public class BookService {
             user.setNumOfBooks(user.getNumOfBooks() + 1);
             userRepository.save(user);
             bookRepository.save(book.get());
-            return String.format("%s %s is borrowed %s", user.getFirstname(), user.getLastname(), book.get().getTitle());
+            return String.format("%s %s is borrowed '%s'", user.getFirstname(), user.getLastname(), book.get().getTitle());
         }
 
         if (book.isPresent()) {
@@ -202,7 +202,7 @@ public class BookService {
             user.setNumOfBooks(user.getNumOfBooks() - 1);
             bookRepository.save(book.get());
             userRepository.save(user);
-            return String.format("You return %s to the library", book.get().getTitle());
+            return String.format("You return '%s' to the library", book.get().getTitle());
         }
         if (book.isPresent() && !book.get().isAvailable() && Objects.equals(user.getId(), book.get().getUser().getId())) {
             return String.format("You didn't borrow %s", book.get().getTitle());
