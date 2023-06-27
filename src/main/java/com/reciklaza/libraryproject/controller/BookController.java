@@ -10,6 +10,7 @@ import com.reciklaza.libraryproject.exception.UnauthorisedAccessException;
 import com.reciklaza.libraryproject.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,12 +41,15 @@ public class BookController {
     public ResponseEntity<List<BookDto>> getAllBooks(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "lastname", required = false) String lastname,
-            @RequestParam(name = "available", required = false) Boolean available) {
-        if (name != null && lastname != null) {
+            @RequestParam(name = "available", required = false) Boolean available
+            ) {
 
+        if (name != null && lastname != null) {
+            log.info("Searching books by author {} {}", name, lastname);
             return ResponseEntity.ok().body(bookService.getByAuthor(name, lastname));
         }
         if (available != null) {
+            log.info("Searching books by availability = {}", available);
             return ResponseEntity.ok().body(bookService.getByAvailable(available));
         }
         return ResponseEntity.ok().body(bookService.getAll());
@@ -80,7 +84,9 @@ public class BookController {
                 throw new NotValidUserSubmissionException("Book is null");
             }
 
-            return ResponseEntity.ok().body(bookService.save(book));
+            BookDto savedBook = bookService.save(book);
+            log.info("Book saved successfully: {}", savedBook);
+            return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
         }
         throw new UnauthorisedAccessException("To add the book, you need to have administrator privileges");
     }
@@ -93,7 +99,7 @@ public class BookController {
      * @return ResponseEntity containing a message indicating the deletion status.
      * @throws UnauthorisedAccessException if the user is not authorized.
      */
-    @DeleteMapping(path = "/admin/book/{id}")
+    @DeleteMapping(path = "/admin/book/{id}/delete")
     public ResponseEntity<String> deleteBookById(
             @RequestHeader(AUTHORIZATION) String jwt,
             @PathVariable(value = "id") Long id
@@ -102,7 +108,11 @@ public class BookController {
             if (id == null) {
                 throw new NotValidUserSubmissionException("Id is null!");
             }
-            return ResponseEntity.ok(bookService.deleteBookById(id));
+
+            String deletedBook = bookService.deleteBookById(id);
+            log.info(deletedBook);
+
+            return new ResponseEntity<>(deletedBook, HttpStatus.NO_CONTENT);
         }
         throw new UnauthorisedAccessException("To delete the book, you need to have administrator privileges");
     }
@@ -122,6 +132,7 @@ public class BookController {
     ) {
         User authorised = jwtService.authorised(jwt, Role.USER);
         if (authorised != null) {
+            log.info(authorised.getFirstname() + " is authorised");
             return ResponseEntity.ok(bookService.borrowBook(id, authorised));
 
         }
@@ -148,6 +159,4 @@ public class BookController {
         }
         throw new UnauthorisedAccessException("To return the book, a user must be logged in.");
     }
-
-
 }

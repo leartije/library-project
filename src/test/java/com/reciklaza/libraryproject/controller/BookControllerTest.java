@@ -86,7 +86,7 @@ class BookControllerTest {
 
         ResponseEntity<BookDto> response = underTest.postBook(MOCK_JWT, BOOK);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(BOOK_DTO, response.getBody());
         assertEquals("Marko Markovic", Objects.requireNonNull(response.getBody()).getAuthor());
     }
@@ -105,7 +105,7 @@ class BookControllerTest {
 
         ResponseEntity<String> response = underTest.deleteBookById(MOCK_JWT, 1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertEquals("'Nova knjiga' is deleted from database", response.getBody());
     }
 

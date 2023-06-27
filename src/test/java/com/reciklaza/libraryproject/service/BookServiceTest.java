@@ -44,6 +44,7 @@ class BookServiceTest {
     @InjectMocks
     private BookService underTest;
 
+
     @Test
     public void testGetAllBooks() {
         when(bookRepository.findAll()).thenReturn(BOOKS);
@@ -53,6 +54,7 @@ class BookServiceTest {
         assertEquals(3, response.size());
         verify(bookRepository, times(1)).findAll();
     }
+
 
     @Test
     public void testGetById_WhenIdIsValid() {

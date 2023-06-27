@@ -1,0 +1,27 @@
+logging:
+    level:
+        org:
+            hibernate: ERROR
+            hibernate.SQL: DEBUG
+            springframework:
+                web: INFO
+spring:
+    datasource:
+        continue-on-error: true
+        initialization-mode: always
+        initialize: true
+        password: 12345
+        url: jdbc:postgresql://localhost:5432/library
+        username: reciklaza
+    jpa:
+        defer-datasource-initialization: true
+        hibernate:
+            ddl-auto: create-drop
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                format_sql: true
+        show-sql: false
+    sql:
+        init:
+            mode: always
