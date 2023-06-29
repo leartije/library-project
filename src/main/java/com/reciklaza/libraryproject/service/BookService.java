@@ -10,16 +10,16 @@ import com.reciklaza.libraryproject.exception.NotValidUserSubmissionException;
 import com.reciklaza.libraryproject.repository.AuthorRepository;
 import com.reciklaza.libraryproject.repository.BookRepository;
 import com.reciklaza.libraryproject.repository.UserRepository;
+import com.reciklaza.libraryproject.util.BookServiceUtilMethods;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.reciklaza.libraryproject.util.Util.validateNotBlank;
 
 /**
  - Service class that provides business logic for managing books in the library.
@@ -35,18 +35,19 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final UserRepository userRepository;
+    private final BookServiceUtilMethods utilMethods;
 
     /**
      Retrieves a list of all books.
      @return List of books.
      @throws BookNotFoundException If no books are found in the database.
      */
-    public List<BookDto> getAll() {
+    public Page<BookDto> getAll(int page, int size) {
         List<Book> books = bookRepository.findAll();
         if (books.isEmpty()) {
             throw new BookNotFoundException("No books in database");
         }
-        return booksListToBookDTOList(books);
+        return utilMethods.transferToPage(utilMethods.booksListToBookDTOList(books), page, size);
     }
 
     /**
@@ -61,7 +62,7 @@ public class BookService {
         if (book.isEmpty()) {
             throw new BookNotFoundException(String.format("Book with id=%d is not found.", id));
         }
-        return bookToBookDTO(book.get());
+        return utilMethods.bookToBookDTO(book.get());
     }
 
     /**
@@ -73,7 +74,7 @@ public class BookService {
     public BookDto getByISBN(String isbn) {
         Optional<Book> book = bookRepository.findByISBN(isbn);
         if (book.isPresent()) {
-            return bookToBookDTO(book.get());
+            return utilMethods.bookToBookDTO(book.get());
         }
         throw new BookNotFoundException(String.format("Book with isbn=%s is not found.", isbn));
     }
@@ -85,14 +86,14 @@ public class BookService {
      @return List of books written by the specified author.
      @throws BookNotFoundException If no books are found by the specified author.
      */
-    public List<BookDto> getByAuthor(String firstName, String lastname) {
+    public Page<BookDto> getByAuthor(String firstName, String lastname, int page, int size) {
         Optional<Author> authorByNameAndLastname =
                 authorRepository.findByNameIgnoreCaseAndLastnameIgnoreCase(firstName, lastname);
         if (authorByNameAndLastname.isEmpty()) {
             throw new BookNotFoundException(String.format("There are no books by '%s %s'.", firstName, lastname));
         }
         Author author = authorByNameAndLastname.get();
-        return booksListToBookDTOList(author.getBooks());
+        return utilMethods.transferToPage(utilMethods.booksListToBookDTOList(author.getBooks()), page, size);
     }
 
     /**
@@ -101,13 +102,13 @@ public class BookService {
      @return List of books based on availability.
      @throws BookNotFoundException If no books are found based on the availability.
      */
-    public List<BookDto> getByAvailable(boolean available) {
+    public Page<BookDto> getByAvailable(boolean available, int page, int size) {
         List<Book> books = bookRepository.findByAvailable(available);
         if (books.isEmpty()) {
             throw new BookNotFoundException(String.format("%s",
                     available ? "No available books in database" : "All books are available"));
         }
-        return booksListToBookDTOList(books);
+        return utilMethods.transferToPage(utilMethods.booksListToBookDTOList(books), page, size);
     }
 
     /**
@@ -117,7 +118,7 @@ public class BookService {
      @throws NotValidUserSubmissionException If the submitted book is not valid.
      */
     public BookDto save(Book book) {
-        validateBook(book);
+        utilMethods.validateBook(book);
 
         Optional<Author> authorByNameAndLastname = authorRepository
                 .findByNameIgnoreCaseAndLastnameIgnoreCase(book.getAuthor().getName(), book.getAuthor().getLastname());
@@ -140,7 +141,7 @@ public class BookService {
         }
 
         bookRepository.save(book);
-        return bookToBookDTO(book);
+        return utilMethods.bookToBookDTO(book);
     }
 
     /**
@@ -209,51 +210,5 @@ public class BookService {
         }
 
         throw new BookNotFoundException(String.format("The Book with id = %d is not found", bookId));
-    }
-
-    //private util methods
-
-    /**
-     Converts a list of books to a list of book DTOs.
-     @param books The list of books to be converted.
-     @return The list of book DTOs.
-     */
-    private List<BookDto> booksListToBookDTOList(List<Book> books) {
-        List<BookDto> booksResponse = new ArrayList<>();
-        for (Book book : books) {
-            BookDto bookDTO = bookToBookDTO(book);
-            booksResponse.add(bookDTO);
-        }
-        return booksResponse;
-    }
-
-    /**
-     Converts a book to a book DTO.
-     @param book The book to be converted.
-     @return The book DTO.
-     */
-    private BookDto bookToBookDTO(Book book) {
-        return BookDto.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .author(String.format("%s %s", book.getAuthor().getName(), book.getAuthor().getLastname()))
-                .ISBN(book.getISBN())
-                .available(book.isAvailable())
-                .build();
-    }
-
-    /**
-     Validates the fields of a book.
-     @param book The book to be validated.
-     @throws NotValidUserSubmissionException If the book is not valid.
-     */
-    private void validateBook(Book book) {
-        validateNotBlank(book.getTitle(), "Title");
-        if (book.getAuthor() == null) {
-            throw new NotValidUserSubmissionException("Author field can't be blank");
-        }
-        validateNotBlank(book.getAuthor().getName(), "Authors firstname");
-        validateNotBlank(book.getAuthor().getLastname(), "Authors lastname");
-        validateNotBlank(book.getISBN(), "ISBN");
     }
 }

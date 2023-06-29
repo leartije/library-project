@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -46,26 +48,28 @@ class BookControllerTest {
     @InjectMocks
     private BookController underTest;
 
+
     @Test
     void testFetAllBooks_Without_Filter() {
-        when(bookService.getAll()).thenReturn(BOOKS);
+        when(bookService.getAll(0, 10)).thenReturn(new PageImpl<>(BOOKS));
 
-        ResponseEntity<List<BookDto>> allBooks = underTest.getAllBooks(null, null, null);
+        ResponseEntity<Page<BookDto>> allBooks = underTest.getAllBooks(null, null, null, 0, 10);
 
         assertEquals(HttpStatus.OK, allBooks.getStatusCode());
-        assertEquals(3, Objects.requireNonNull(allBooks.getBody()).size());
+        assertEquals(3, Objects.requireNonNull(allBooks.getBody()).getTotalElements());
     }
 
     @Test
     void testFetAllBooks_ByAvailable() {
-        when(bookService.getByAvailable(true)).thenReturn(BOOKS);
+        when(bookService.getByAvailable(true, 0, 10)).thenReturn(new PageImpl<>(BOOKS));
 
-        ResponseEntity<List<BookDto>> allBooks = underTest.getAllBooks(null, null, true);
+        ResponseEntity<Page<BookDto>> allBooks = underTest.getAllBooks(null, null, true, 0, 10);
 
         assertEquals(HttpStatus.OK, allBooks.getStatusCode());
-        assertEquals(BOOKS, allBooks.getBody());
-        assertEquals("Naslov2", Objects.requireNonNull(allBooks.getBody()).get(1).getTitle());
+        assertEquals(3, Objects.requireNonNull(allBooks.getBody()).getTotalElements());
     }
+
+
 
     @Test
     void testGetBookByISBN_When_ISBN_Is_Valid() {

@@ -10,11 +10,10 @@ import com.reciklaza.libraryproject.exception.UnauthorisedAccessException;
 import com.reciklaza.libraryproject.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controller class for handling book-related API endpoints.
@@ -30,29 +29,33 @@ public class BookController {
     private final JwtService jwtService;
 
     /**
-     * Retrieves a list of all books.
+     * Retrieve a paginated list of books.
      *
-     * @param name      Optional parameter to filter books by author's name.
-     * @param lastname  Optional parameter to filter books by author's lastname.
-     * @param available Optional parameter to filter books by availability.
-     * @return ResponseEntity containing the list of book DTOs.
+     * @param name       (optional) Filter books by author's first name.
+     * @param lastname   (optional) Filter books by author's last name.
+     * @param available  (optional) Filter books by availability (true or false).
+     * @param page       (optional, default: 0) Page number (zero-based index).
+     * @param size       (optional, default: 10) Page size.
+     * @return ResponseEntity containing a Page of BookDto objects.
      */
     @GetMapping(path = "/public/books")
-    public ResponseEntity<List<BookDto>> getAllBooks(
+    public ResponseEntity<Page<BookDto>> getAllBooks(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "lastname", required = false) String lastname,
-            @RequestParam(name = "available", required = false) Boolean available
-            ) {
+            @RequestParam(name = "available", required = false) Boolean available,
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size
+    ) {
 
         if (name != null && lastname != null) {
             log.info("Searching books by author {} {}", name, lastname);
-            return ResponseEntity.ok().body(bookService.getByAuthor(name, lastname));
+            return ResponseEntity.ok().body(bookService.getByAuthor(name, lastname, page, size));
         }
         if (available != null) {
             log.info("Searching books by availability = {}", available);
-            return ResponseEntity.ok().body(bookService.getByAvailable(available));
+            return ResponseEntity.ok().body(bookService.getByAvailable(available, page, size));
         }
-        return ResponseEntity.ok().body(bookService.getAll());
+        return ResponseEntity.ok().body(bookService.getAll(page, size));
     }
 
     /**

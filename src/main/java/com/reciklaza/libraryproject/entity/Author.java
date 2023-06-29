@@ -1,5 +1,6 @@
 package com.reciklaza.libraryproject.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class Author {
     @NotBlank
     private String lastname;
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("author")
     private List<Book> books;
 
 }
