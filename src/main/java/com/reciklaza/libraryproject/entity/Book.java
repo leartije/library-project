@@ -1,6 +1,7 @@
 package com.reciklaza.libraryproject.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.reciklaza.libraryproject.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,8 @@ public class Book {
     private String title;
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @JsonIgnoreProperties("books")
+    //@JsonIgnoreProperties("books")
+    @JsonManagedReference
     private Author author;
     private String ISBN;
     private boolean available;

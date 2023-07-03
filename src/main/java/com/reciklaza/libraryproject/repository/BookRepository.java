@@ -15,6 +15,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, PagingAndSort
     @Query("SELECT b FROM Book b WHERE b.ISBN = :ISBN")
     Optional<Book> findByISBN(@Param("ISBN") String isbn);
 
+    @SuppressWarnings("unused")
     @Query("SELECT b FROM Book b WHERE b.author.id = :authorId")
     List<Book> findByAuthorId(@Param("authorId") String id);
 

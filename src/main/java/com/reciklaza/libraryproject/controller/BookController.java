@@ -128,7 +128,7 @@ public class BookController {
      * @return ResponseEntity containing a message indicating the borrowing status.
      * @throws UnauthorisedAccessException if the user is not logged in.
      */
-    @GetMapping(path = "/user/book/borrow/{id}")
+    @GetMapping(path = "/user/book/{id}/borrow")
     public ResponseEntity<String> borrowTheBook(
             @RequestHeader(AUTHORIZATION) String jwt,
             @PathVariable(value = "id") Long id
@@ -150,7 +150,7 @@ public class BookController {
      * @return ResponseEntity containing a message indicating the return status.
      * @throws UnauthorisedAccessException if the user is not logged in.
      */
-    @GetMapping(path = "/user/book/return/{id}")
+    @GetMapping(path = "/user/book/{id}/return")
     public ResponseEntity<String> returnTheBook(
             @RequestHeader(AUTHORIZATION) String jwt,
             @PathVariable(value = "id") Long id
